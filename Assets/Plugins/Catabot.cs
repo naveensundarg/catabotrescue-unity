@@ -9,6 +9,9 @@ public class Catabot :MonoBehaviour  {
 	static float _xPos;
 	static float D =.132f;
 
+
+	public int[] specs;
+
 	private static Sprite[] _headSprites;
 
 	void Start () 
@@ -27,7 +30,6 @@ public class Catabot :MonoBehaviour  {
 
 			GameObject block = new GameObject("[Block "+specs[i] +"]");
 			addSprite(block,controller.blockSprite);
-		//	SpriteRenderer blockRenderer = block.GetComponent<SpriteRenderer>();
 			width=width+getSpriteWidth(block);//blockRenderer.bounds.size.x;
 
 			if(i==0){
@@ -35,7 +37,7 @@ public class Catabot :MonoBehaviour  {
 				GameObject head = new GameObject("Head");
 				
 				//addSprite(head, "Assets/Resources/Sprites/rdg_head_anims_0.png");
-				addPhysicsAndParent(head,catabot,false);
+				addPhysicsAndParent(head,catabot,false,false);
 				head.AddComponent<SpriteRenderer>();
 				SpriteRenderer renderer = head.GetComponent<SpriteRenderer>();
 				renderer.sprite = controller.headSprites[0];
@@ -45,12 +47,15 @@ public class Catabot :MonoBehaviour  {
 
 				height=getSpriteHeight(block);
 				head.transform.localPosition=new Vector2(head.transform.localPosition.y-width/2-headWidth/2, head.transform.localPosition.y);
-				width=width;//+headWidth;
 
 				_xOffset=width/2;//+headWidth/2;
 			}
 
-			addPhysicsAndParent(block,catabot,false);
+			addPhysicsAndParent(block,catabot,false,true);
+
+			block.AddComponent<Block>();
+			block.GetComponent<Block>().limbs=specs[i];
+			block.GetComponent<Block>().location=i;
 			_limbOffsetUpper=0;
 			_limbOffsetLower=0;
 			addLimbs(specs[i],block,controller);
@@ -59,6 +64,7 @@ public class Catabot :MonoBehaviour  {
 		}
 
 		catabot.AddComponent<Catabot>();
+		catabot.GetComponent<Catabot>().specs=specs;
 		catabot.AddComponent<Drag>();
 		catabot.AddComponent<Rigidbody2D>();
 		catabot.AddComponent<BoxCollider2D>();
@@ -109,12 +115,12 @@ public class Catabot :MonoBehaviour  {
 
 			if(limbs>0)addSprite(limbUpper,controller.handPos1); 
 			else addSprite(limbUpper,controller.handNeg1);
-			addPhysicsAndParent(limbUpper,block,true);
+			addPhysicsAndParent(limbUpper,block,true,false);
 
 			GameObject limbLower = new GameObject("limb");
 			if(limbs>0)addSprite(limbLower,controller.handPos2);
 				else addSprite(limbLower,controller.handNeg2);
-			addPhysicsAndParent(limbLower,block, true);
+			addPhysicsAndParent(limbLower,block, true,false);
 
 			placeLimbs(limbUpper,-blockRenderer.bounds.max.y,limbLower,blockRenderer.bounds.max.y);
 
@@ -123,22 +129,25 @@ public class Catabot :MonoBehaviour  {
 
 	}
 
-	private static void addPhysicsAndParent(GameObject child, GameObject parent,bool isTrigger){
-//		child.AddComponent<SpringJoint2D>();
-//		SpringJoint2D spring=  child.GetComponent<SpringJoint2D>();
-//		spring.dampingRatio=dampingRatio;
-//		spring.frequency=0.25f;
-//		spring.distance=0f;
+	private static void addPhysicsAndParent(GameObject child, GameObject parent,bool isTrigger, bool isBlock){
+
 		child.AddComponent<Drag>();
 		child.AddComponent<Rigidbody2D>();
-	//	child.rigidbody2D.isKinematic=true;
+		child.rigidbody2D.isKinematic=!isBlock;
 		child.rigidbody2D.gravityScale=0;
-		child.rigidbody2D.mass=1;
+		child.rigidbody2D.mass=0;
 		child.AddComponent<BoxCollider2D>();
-		child.rigidbody2D.isKinematic=true;
 
 		child.collider2D.isTrigger=true;
 		child.transform.parent=parent.transform;
+
+		if(isBlock){
+
+			BoxCollider2D boxcollider=child.GetComponent<BoxCollider2D>();
+			boxcollider.size= new Vector2(0.15f, 1.75f);
+
+		}
+
 	}
 
 

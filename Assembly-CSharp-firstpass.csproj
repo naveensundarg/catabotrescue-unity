@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{2D20C913-AECB-D651-AB71-F11DA0B567B5}</ProjectGuid>
+	<ProjectGuid>{AA62B294-6EBF-20C7-5721-3728486CA465}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -50,7 +50,6 @@
      <Compile Include="Assets\Plugins\Catabot.cs" />
      <Compile Include="Assets\Plugins\Controller.cs" />
      <Compile Include="Assets\Plugins\Drag.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
