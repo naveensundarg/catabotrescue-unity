@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Plugins\Block.cs" />
+     <Compile Include="Assets\Plugins\ButtonBehavior.cs" />
      <Compile Include="Assets\Plugins\Catabot.cs" />
      <Compile Include="Assets\Plugins\Controller.cs" />
      <Compile Include="Assets\Plugins\Drag.cs" />

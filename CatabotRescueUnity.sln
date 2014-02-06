@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 
 Project("{C8814FE3-3E31-56DB-B475-6502BCDA8ECD}") = "CatabotRescueUnity", "Assembly-CSharp-firstpass.csproj", "{AA62B294-6EBF-20C7-5721-3728486CA465}"
 EndProject
+Project("{C8814FE3-3E31-56DB-B475-6502BCDA8ECD}") = "CatabotRescueUnity", "Assembly-CSharp.csproj", "{ECA937FB-A0F4-CF78-0692-DBB2F063159E}"
+EndProject
 Project("{C8814FE3-3E31-56DB-B475-6502BCDA8ECD}") = "CatabotRescueUnity", "Assembly-UnityScript.unityproj", "{D8BB4F6B-BB12-C570-76ED-55DC38A90FF9}"
 EndProject
 Global
@@ -15,6 +17,10 @@ Global
 		{AA62B294-6EBF-20C7-5721-3728486CA465}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA62B294-6EBF-20C7-5721-3728486CA465}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA62B294-6EBF-20C7-5721-3728486CA465}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA937FB-A0F4-CF78-0692-DBB2F063159E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA937FB-A0F4-CF78-0692-DBB2F063159E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA937FB-A0F4-CF78-0692-DBB2F063159E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA937FB-A0F4-CF78-0692-DBB2F063159E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D8BB4F6B-BB12-C570-76ED-55DC38A90FF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8BB4F6B-BB12-C570-76ED-55DC38A90FF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8BB4F6B-BB12-C570-76ED-55DC38A90FF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -23,7 +29,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-		GlobalSection(MonoDevelopProperties) = preSolution
+								GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1

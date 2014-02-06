@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System;
 public class Catabot :MonoBehaviour  {
 	public static float dampingRatio=0.5f;
 	static float _blockOffset=0;
@@ -8,10 +8,10 @@ public class Catabot :MonoBehaviour  {
 	static float _limbOffsetLower=0;
 	static float _xPos;
 	static float D =.132f;
-
+	static int id=0;
 
 	public int[] specs;
-
+	private Controller controller;
 	private static Sprite[] _headSprites;
 
 	void Start () 
@@ -21,7 +21,7 @@ public class Catabot :MonoBehaviour  {
 	public static GameObject createCatabot(int[] specs, Controller controller){
 		_headSprites = Resources.LoadAll<Sprite>("Assets/Resources/Sprites/rdg_head_anims.png"); 
 		Debug.Log("HeadSprites Count "+_headSprites.Length);
-		GameObject catabot = new GameObject(specs.ToString());
+		GameObject catabot = new GameObject("Catabot ["+string.Join(",", Array.ConvertAll(specs, x => x.ToString()))+"] ID:"+id++);
 		float width=0f;
 		float height=0f;
 		float _xOffset=-1;
@@ -74,6 +74,8 @@ public class Catabot :MonoBehaviour  {
 		collider.center=new Vector2(width/2-_xOffset,0);
 		_xPos=0;
 		_blockOffset=0;
+		catabot.GetComponent<Catabot>().controller=controller;
+
 		return catabot;
 	}
 
