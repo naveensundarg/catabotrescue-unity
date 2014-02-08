@@ -40,7 +40,7 @@ public class Catabot :MonoBehaviour  {
 				addPhysicsAndParent(head,catabot,false,false);
 				head.AddComponent<SpriteRenderer>();
 				SpriteRenderer renderer = head.GetComponent<SpriteRenderer>();
-				renderer.sprite = controller.headSprites[0];
+				//renderer.sprite = controller.headSprites[0];
 				head.AddComponent<CircleCollider2D>();
 
 				float headWidth= getSpriteWidth(head);//headRenderer.bounds.size.x;
@@ -142,6 +142,7 @@ public class Catabot :MonoBehaviour  {
 		child.rigidbody2D.gravityScale=0;
 		child.rigidbody2D.mass=0;
 		child.AddComponent<BoxCollider2D>();
+//		child.rigidbody2D.isKinematic=!]t;
 
 		child.collider2D.isTrigger=true;
 		child.transform.parent=parent.transform;

@@ -30,23 +30,28 @@ public class Drag : MonoBehaviour {
 		
 	}
 	
-	
-	void OnMouseDrag()     
-	{
-		
+
+	void FixedUpdate(){
 		if (_selected ) 
 		{
 			
 			Vector2 cursorPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);//getting cursor position
 			
 			//transform.position=cursorPosition;
-
+			
 			dragRoot(gameObject, cursorPosition);
-
+			
 			//spring.connectedAnchor = cursorPosition;//the anchor get's cursor's position
 			_lastTouch=cursorPosition;
 			
 		}
+	
+	}
+
+	void OnMouseDrag()     
+	{
+		
+
 	}
 	
 	void dragRoot(GameObject obj,Vector2 cursorPosition){
