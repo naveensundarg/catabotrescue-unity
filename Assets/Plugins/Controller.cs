@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System;
-
+using SimpleJSON;
 
 public class Controller : MonoBehaviour {
 
-
-
+	public GUIText prisonLabel;
+	public string levelSpecs;
 	public Sprite[] headSprites;
 	public Sprite blockSprite;
 	public Sprite handNeg1,handNeg2,handPos1,handPos2;
@@ -15,20 +16,26 @@ public class Controller : MonoBehaviour {
 
 	public GameObject undoButton, redoButton, resetButton;
 
-	private Stack<GameObject> history;
+	public Stack<GameObject> history;
 	private Stack<GameObject> future;
-	
+	private JSONNode _levelsJson;
+
+	private Stack<GameObject> starting;
+	private int finalLevel;
+	private int _currentLevel=1;
 
 	// Use this for initialization
 	void Start () {
 
+		_levelsJson=JSON.Parse(levelSpecs);
+		finalLevel = _levelsJson.Count;
 		history=new Stack<GameObject>();
 		future=new Stack<GameObject>();
-
-		int[] bot1 = new int[] { 1, -4};
-		Catabot.createCatabot(bot1,this);
-		int[] bot2 = new int[] { 4, 1};
-		Catabot.createCatabot(bot2,this);
+		loadNewLevel (_currentLevel);
+//		int[] bot1 = new int[] { 1, -4};
+//		placeRandomly(Catabot.createCatabot(bot1,this));
+//		int[] bot2 = new int[] { 4, 1};
+//		placeRandomly(Catabot.createCatabot(bot2,this));
 
 		undoButton.GetComponent<ButtonBehavior>().disabled=true;
 		undoButton.GetComponent<ButtonBehavior>().action="undo";
@@ -98,11 +105,59 @@ public class Controller : MonoBehaviour {
 
 		int[] specs1= c1.GetComponent<Catabot>().specs;
 		int[] specs2= c2.GetComponent<Catabot>().specs;
+		int[] merged = mergeSpecs (specs1, specs2, a, b);
 
-		UpdateHistory(Catabot.createCatabot(mergeSpecs(specs1,specs2,a,b),this));
+		if (merged.Length > 0)
+			UpdateHistory (Catabot.createCatabot (merged, this));
+		else {
+			finishLevel();	
+		}
 	}
 
+	private void loadNewLevel(int level){
+		clearLevel();
+		prisonLabel.text = "Prison: " + _currentLevel;
 
+		int[][] catabots = getLevel(level);
+		starting = new Stack<GameObject> ();
+		for (int c = 0; c < catabots.Length; c++){
+
+			starting.Push(placeRandomly(Catabot.createCatabot(catabots[c],this)));
+		}
+
+
+	}
+
+	private void clearLevel(){
+		while (history.Count>0) 
+			Destroy(history.Pop());		
+		while (starting!=null && starting.Count>0) 
+			Destroy(starting.Pop());	
+
+	}
+
+	private void finishLevel(){
+
+		if(_currentLevel!=finalLevel){
+
+			_currentLevel++;
+			loadNewLevel(_currentLevel);
+		}
+		else
+		{
+			Application.LoadLevel("home");
+		}
+
+	}
+
+	private void printArray(int[] s){
+		string p="[";
+		foreach(int i in s){
+			p=p+i + " ";
+		}
+		p = p + "]";
+		Debug.Log (p);
+	}
 	private int[] mergeSpecs(int[] specs1, int[] specs2, int a, int b){
 		HashSet<int> limbs=new HashSet<int>();
 		int[] specs = new int[specs1.Length+specs2.Length-2];
@@ -131,6 +186,45 @@ public class Controller : MonoBehaviour {
 		Array.Resize(ref specs, index);
 		return specs;
 
+	}
+
+
+	GameObject placeRandomly(GameObject obj){
+		float screenWidth = Camera.main.pixelWidth;
+		float screenHeight= Camera.main.pixelHeight;
+
+		Vector2 pos = Camera.main.ScreenToWorldPoint(new Vector2 (UnityEngine.Random.Range (0.2f *	 screenWidth, 0.8f * screenWidth),
+		                                      UnityEngine.Random.Range(0.2f * screenHeight, 0.8f * screenHeight)
+		                                                                     ));
+		obj.transform.position = new Vector3 (pos.x, pos.y, 0);
+
+		return obj;
+	}
+
+
+	int[][] getLevel(int level){
+		JSONArray catabotSpecs = _levelsJson["Level_"+level].AsArray;
+
+		int[][] levelSpecs= new int[catabotSpecs.Count][];
+
+		for(int c = 0; c<catabotSpecs.Count;c++){
+			string currentCatabot = catabotSpecs[c];
+			string[] blocks = currentCatabot.Split('|');
+			levelSpecs[c]=new int[blocks.Length];
+			for (int b = 0; b<blocks.Length;b++){
+				levelSpecs[c][b]=int.Parse(blocks[b]);
+
+			}
+
+		}
+		//gameObject.GetComponent<Levels> ().getLevel (level);
+		//int[][] levels =(int[][]) levelsJson.GetObject("Levels_"+level);
+		return levelSpecs;
+	}
+
+	void OnGUI (){
+
+	
 	}
 
 

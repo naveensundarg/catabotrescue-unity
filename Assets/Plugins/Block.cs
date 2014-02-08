@@ -23,17 +23,24 @@ public class Block : MonoBehaviour {
 		GameObject otherObj=other.gameObject;
 		if(otherObj.GetComponent<Block>() != null)
 		{
-			if(otherObj.transform.root.position.y<transform.root.position.y)
-			{
 			Debug.Log("Colliding with another block");
-			if(otherObj.GetComponent<Block>().limbs==-limbs){
-
+			if(otherObj.GetComponent<Block>().limbs==-limbs)
+			{
+				if(otherObj.transform.root.position.y<transform.root.position.y)
+				{
 				Debug.Log ("Reproduction!");
 
 				_controller.reproduce(gameObject.transform.root.gameObject,otherObj.transform.root.gameObject,location, otherObj.GetComponent<Block>().location);
 
 				}
 			}
+			else{
+
+			//	gameObject.BroadcastMessage("RetractLimbs");
+			}
+
+
+
 
 		}
 	}

@@ -118,11 +118,14 @@ public class Catabot :MonoBehaviour  {
 			if(limbs>0)addSprite(limbUpper,controller.handPos1); 
 			else addSprite(limbUpper,controller.handNeg1);
 			addPhysicsAndParent(limbUpper,block,true,false);
+			limbUpper.AddComponent<Limb>();
 
 			GameObject limbLower = new GameObject("limb");
 			if(limbs>0)addSprite(limbLower,controller.handPos2);
 				else addSprite(limbLower,controller.handNeg2);
+
 			addPhysicsAndParent(limbLower,block, true,false);
+			limbLower.AddComponent<Limb>();
 
 			placeLimbs(limbUpper,-blockRenderer.bounds.max.y,limbLower,blockRenderer.bounds.max.y);
 

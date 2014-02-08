@@ -40,7 +40,7 @@ public class ButtonBehavior : MonoBehaviour {
 		currentSprite=selectedSprite;
 	}
 	
-	void OnMouseUpAsButton(){
+	void OnMouseUp(){
 		
 		
 		currentSprite=normalSprite;
