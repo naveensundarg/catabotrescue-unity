@@ -22,11 +22,13 @@ public class Controller : MonoBehaviour {
 
 	private Stack<GameObject> starting;
 	private int finalLevel;
-	private int _currentLevel=1;
+	private int _currentLevel=3;
+
+	public bool inputEnabled;
 
 	// Use this for initialization
 	void Start () {
-
+		inputEnabled = true;
 		_levelsJson=JSON.Parse(levelSpecs);
 		finalLevel = _levelsJson.Count;
 		history=new Stack<GameObject>();
@@ -53,7 +55,7 @@ public class Controller : MonoBehaviour {
 	}
 
 
-	public void UpdateHistory(GameObject obj){
+	public GameObject UpdateHistory(GameObject obj){
 		history.Push(obj);
 		if(undoButton.GetComponent<ButtonBehavior>().disabled){
 
@@ -61,6 +63,8 @@ public class Controller : MonoBehaviour {
 		}
 
 		future.Clear();
+
+		return obj;
 	}
 
 	bool canUndo(){ return history.Count>0;}
@@ -108,7 +112,19 @@ public class Controller : MonoBehaviour {
 		int[] merged = mergeSpecs (specs1, specs2, a, b);
 
 		if (merged.Length > 0)
-			UpdateHistory (Catabot.createCatabot (merged, this));
+		{
+			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
+			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
+
+
+			float c1y=c1.transform.position.y;
+			float c2y=c2.transform.position.y;
+			
+
+			GameObject child = UpdateHistory (Catabot.createCatabot (merged, this));
+			child.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
+			                                     c1y*0.5f+c2y*0.5f);
+		}
 		else {
 			finishLevel();	
 		}

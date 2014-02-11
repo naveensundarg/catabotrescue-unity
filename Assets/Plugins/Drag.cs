@@ -6,42 +6,41 @@ public class Drag : MonoBehaviour {
 	private bool _selected=false;
 	private Vector2 _lastTouch;
 	private Controller _controller;
+	private SpringJoint2D spring;
+	private bool _active;
 
+	public GameObject catabot;
 	void Awake()
 	{
 
 		_controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Controller>();
-//		
-//		spring = this.gameObject.GetComponent<SpringJoint2D>(); //"spring" is the SpringJoint2D component that I added to my object
-//		
-//		spring.connectedAnchor = gameObject.transform.position;//i want the anchor position to start at the object's position
-//		
+	//		
 	}
-	
+
+	public bool getSelected(){
+		if(gameObject==catabot)
+		   return _selected;
+		   else
+		   return catabot.GetComponent<Drag>().getSelected();
+	}
 	
 	void OnMouseDown()
 	{
-		_selected=true;
+		_active=true;
+		selected ();
 		_lastTouch=Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		_controller.maxZ=_controller.maxZ+1;
 
 		transform.root.gameObject.BroadcastMessage("bringUpTo",_controller.maxZ);
-//		spring.enabled = true;//I'm reactivating the SpringJoint2D component each time I'm clicking on my object becouse I'm disabling it after I'm releasing the mouse click so it will fly in the direction i was moving my mouse
-		
+			
 	}
 	
 
 	void FixedUpdate(){
-		if (_selected ) 
+		if (_active && inputEnabled() ) 
 		{
-			
 			Vector2 cursorPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);//getting cursor position
-			
-			//transform.position=cursorPosition;
-			
-			dragRoot(gameObject, cursorPosition);
-			
-			//spring.connectedAnchor = cursorPosition;//the anchor get's cursor's position
+			dragRootBy(cursorPosition-_lastTouch);
 			_lastTouch=cursorPosition;
 			
 		}
@@ -54,13 +53,10 @@ public class Drag : MonoBehaviour {
 
 	}
 	
-	void dragRoot(GameObject obj,Vector2 cursorPosition){
+	public void dragRootBy(Vector2 delta){
+		GameObject dragabble = gameObject.transform.root.gameObject;
 
-		
-		GameObject root= obj.transform.root.gameObject;
-		root.transform.position=new Vector2(root.transform.position.x,root.transform.position.y) + (cursorPosition-_lastTouch);
-		//root.transform.position=new Vector3(root.transform.position.x,root.transform.position.y,1);
-
+		dragabble.transform.position = new Vector2 (dragabble.transform.position.x, dragabble.transform.position.y) + delta;
 
 	}
 	void bringUpTo(int z){
@@ -72,13 +68,27 @@ public class Drag : MonoBehaviour {
 
 	}
 
-
 	void OnMouseUp()     
 	{
-		_selected=false;
+		_active=false;
+		deselected ();
 
-//		spring.enabled = false;//disabling the spring component
-		
 	}
-	
+	public void selected(){
+		_selected = true;
+		if(gameObject!=catabot)
+			catabot.GetComponent<Drag> ().selected ();	
+
+	}
+
+	public bool inputEnabled(){
+		return _controller.inputEnabled;
+	}
+	public void deselected(){
+		_selected = false;
+		if(gameObject!=catabot)
+		catabot.GetComponent<Drag> ().deselected ();	
+
+	}
+
 }
