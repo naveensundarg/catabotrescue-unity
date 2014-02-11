@@ -100,12 +100,13 @@ public class Block : MonoBehaviour {
 						                                                         p1<p2?
 						                                                         p1+SEPARATION_DISTANCE:p1-SEPARATION_DISTANCE);
 						//otherObj.GetComponent<Drag>().dragRootBy(new Vector2(p1.x-p2.x,p1.y-p2.y+2.51f));
+						disableInput();
+
 						_controller.reproduce(gameObject.transform.root.gameObject,
 						                      otherObj.transform.root.gameObject,
 						                      location, 
 						                      otherObj.GetComponent<Block>().location);
 						currentMate=otherObj;
-						disableInput();
 						Invoke("pushAway",1);
 					}
 				//	Debug.Log ("Reproduction!");

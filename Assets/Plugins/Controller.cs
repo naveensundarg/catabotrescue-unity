@@ -24,7 +24,7 @@ public class Controller : MonoBehaviour {
 	private int finalLevel;
 	private int _currentLevel=3;
 
-	public bool inputEnabled;
+	public bool inputEnabled { get; set;}
 
 	// Use this for initialization
 	void Start () {
@@ -140,11 +140,14 @@ public class Controller : MonoBehaviour {
 
 			starting.Push(placeRandomly(Catabot.createCatabot(catabots[c],this)));
 		}
+		inputEnabled = true;
 
 
 	}
 
 	private void clearLevel(){
+		inputEnabled = true;
+
 		while (history.Count>0) 
 			Destroy(history.Pop());		
 		while (starting!=null && starting.Count>0) 
@@ -154,9 +157,11 @@ public class Controller : MonoBehaviour {
 
 	private void finishLevel(){
 
+		inputEnabled = true;
 		if(_currentLevel!=finalLevel){
 
 			_currentLevel++;
+			inputEnabled=true;
 			loadNewLevel(_currentLevel);
 		}
 		else
@@ -203,6 +208,8 @@ public class Controller : MonoBehaviour {
 		return specs;
 
 	}
+
+
 
 
 	GameObject placeRandomly(GameObject obj){
