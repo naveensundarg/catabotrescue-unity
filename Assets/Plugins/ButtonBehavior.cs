@@ -46,12 +46,12 @@ public class ButtonBehavior : MonoBehaviour {
 		currentSprite=normalSprite;
 		
 		if(action=="undo"){
-			controller.Undo();
-			Debug.Log("Undoing");
+		//	controller.Undo();
+		//	Debug.Log("Undoing");
 		}
 		if(action=="redo"){
-			controller.Redo();
-			Debug.Log("Redoing");
+		//	controller.Redo();
+		//	Debug.Log("Redoing");
 		}
 	}
 }

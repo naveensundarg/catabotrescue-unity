@@ -15,7 +15,11 @@ public class Controller : MonoBehaviour {
 	public int maxZ=0;
 
 	public GameObject undoButton, redoButton, resetButton;
+	public Texture undoDisabled, redoDisabled;
 
+	public GUIStyle undoButtonStyle;
+	public GUIStyle redoButtonStyle;
+	private GUIStyle _emptyStyle=new GUIStyle();
 	public Stack<GameObject> history;
 	private Stack<GameObject> future;
 	private JSONNode _levelsJson;
@@ -23,6 +27,9 @@ public class Controller : MonoBehaviour {
 	private Stack<GameObject> starting;
 	private int finalLevel;
 	private int _currentLevel=3;
+
+	private Rect _undoRect =new Rect (10, 10, 75, 75);
+	private Rect _redoRect = new  Rect (100, 10, 75, 75);
 
 	public bool inputEnabled { get; set;}
 
@@ -246,8 +253,25 @@ public class Controller : MonoBehaviour {
 	}
 
 	void OnGUI (){
+		GUI.skin = null;
+
+
+		GUI.BeginGroup(new Rect(0, Screen.height-100, Screen.width, 100));
+
+		if (!canUndo()) 
+			GUI.Button (_undoRect,  undoDisabled,_emptyStyle);
+
+		if (!canRedo()) 
+			GUI.Button (_redoRect,  redoDisabled,_emptyStyle);
+		
+		if (canUndo()&& GUI.Button (_undoRect, "", undoButtonStyle)) 
+			Undo();
+				
+		if (canRedo () && GUI.Button (_redoRect, "", redoButtonStyle)) 
+			Redo ();
 
 	
+		GUI.EndGroup ();
 	}
 
 
