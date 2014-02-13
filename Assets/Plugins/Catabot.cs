@@ -15,12 +15,49 @@ public class Catabot :MonoBehaviour  {
 	public float rightSide;
 	public float leftSide;
 
+	private bool _angry;
 	private Controller controller;
 	private static Sprite[] _headSprites;
 
+	protected GameObject head;
 	void Start () 
 	{
-	
+		_angry = false;
+		Invoke ("changeHead",UnityEngine.Random.Range (1,2));
+		controller =(Controller) GameObject.FindGameObjectWithTag ("Controller").GetComponent<Controller> ();
+
+
+	}
+	void Update(){
+	}
+	public void selectedHead(){
+			head.GetComponent<SpriteRenderer> ().sprite = controller.selecteHeadSprite;
+
+	}
+	public void setAngryHead(){
+		head.GetComponent<SpriteRenderer> ().sprite = controller.angryHeadSprite;
+		_angry = true;
+	}
+	public void deSelectedHead(){
+		head.GetComponent<SpriteRenderer> ().sprite = controller.normalHeadSprite;
+
+		Invoke ("changeHead",UnityEngine.Random.Range (1,2));
+	}
+
+	public void setNormalHead(){
+		head.GetComponent<SpriteRenderer> ().sprite = controller.normalHeadSprite;
+		_angry = false;
+		Invoke ("changeHead",UnityEngine.Random.Range (1,2));
+	}
+	public void changeHead(){
+		Debug.Log ("Changing Head");
+		if (!gameObject.GetComponent<Drag> ().getSelected ()&& !_angry)
+
+		{
+			head.GetComponent<SpriteRenderer> ().sprite = controller.headSprites [UnityEngine.Random.Range (0, controller.headSprites.Length)];
+			Invoke ("changeHead", UnityEngine.Random.Range (0.5f, 3));
+		}
+
 	}
 	public static GameObject createCatabot(int[] specs, Controller controller){
 		_headSprites = Resources.LoadAll<Sprite>("Assets/Resources/Sprites/rdg_head_anims.png"); 
@@ -31,6 +68,31 @@ public class Catabot :MonoBehaviour  {
 		float headWidth=0;
 		float _xOffset=-1;
 		float _leftSide=0;
+
+		
+		catabot.AddComponent<Catabot>();
+		catabot.GetComponent<Catabot>().specs=specs;
+		GameObject head = new GameObject("Head");
+		
+		addPhysicsAndParent(head,catabot,false,false,catabot);
+		head.AddComponent<SpriteRenderer>();
+		SpriteRenderer renderer = head.GetComponent<SpriteRenderer>();
+		renderer.sprite = controller.headSprites[0];
+		head.AddComponent<CircleCollider2D>();
+		GameObject dummyblock = new GameObject("[Block "+1 +"]");
+		addSprite(dummyblock,controller.blockSprite);
+		addPhysicsAndParent(dummyblock,catabot,false,true,catabot);
+		width=width+getSpriteWidth(dummyblock);//blockRenderer.bounds.size.x;
+
+		headWidth= getSpriteWidth(head);//headRenderer.bounds.size.x;
+		height=getSpriteHeight(dummyblock);
+		head.transform.localPosition=new Vector2(head.transform.localPosition.y-width/2-headWidth/2, head.transform.localPosition.y);
+		_xOffset=width/2;//+headWidth/2;
+		
+		_leftSide=headWidth*.5f+0.5f*getSpriteWidth(dummyblock);
+		
+		catabot.GetComponent<Catabot> ().head = head;
+		Destroy (dummyblock);
 		//addSprite(catabot,""
 		for(int i = 0; i < specs.Length; i++){
 
@@ -40,20 +102,7 @@ public class Catabot :MonoBehaviour  {
 
 			if(i==0){
 				//Adding the first block
-				GameObject head = new GameObject("Head");
 
-				addPhysicsAndParent(head,catabot,false,false,catabot);
-				head.AddComponent<SpriteRenderer>();
-				SpriteRenderer renderer = head.GetComponent<SpriteRenderer>();
-				renderer.sprite = controller.headSprites[0];
-				head.AddComponent<CircleCollider2D>();
-
-				 headWidth= getSpriteWidth(head);//headRenderer.bounds.size.x;
-				height=getSpriteHeight(block);
-				head.transform.localPosition=new Vector2(head.transform.localPosition.y-width/2-headWidth/2, head.transform.localPosition.y);
-				_xOffset=width/2;//+headWidth/2;
-
-				_leftSide=headWidth*.5f+0.5f*getSpriteWidth(block);
 			}
 
 			addPhysicsAndParent(block,catabot,false,true,catabot);
@@ -67,10 +116,7 @@ public class Catabot :MonoBehaviour  {
 
 			placeBlock (block);
 		}
-
-		catabot.AddComponent<Catabot>();
-		catabot.GetComponent<Catabot>().specs=specs;
-		catabot.AddComponent<SpringJoint2D> ();
+				catabot.AddComponent<SpringJoint2D> ();
 		catabot.AddComponent<Drag>();
 		catabot.GetComponent<Drag> ().catabot = catabot;;
 		catabot.AddComponent<Rigidbody2D>();
@@ -170,7 +216,7 @@ public class Catabot :MonoBehaviour  {
 		}
 
 	}
-
+	
 
 	private static void placeBlock(GameObject block){
 		block.transform.position=new Vector2(block.transform.position.x+_blockOffset,block.transform.position.y);
@@ -196,6 +242,7 @@ public class Catabot :MonoBehaviour  {
 			_xPos=_xPos+2*D;
 		
 	}
+
 
 	private static void placeLimbLower(GameObject limb, float y){
 		

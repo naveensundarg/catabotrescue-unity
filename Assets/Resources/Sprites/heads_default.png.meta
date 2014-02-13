@@ -147,20 +147,20 @@ TextureImporter:
     - name: heads_default_11
       rect:
         serializedVersion: 2
-        x: 45
-        y: 124
-        width: 38
-        height: 4
+        x: 0
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
     - name: heads_default_12
       rect:
         serializedVersion: 2
-        x: 173
-        y: 124
-        width: 38
-        height: 4
+        x: 128
+        y: 0
+        width: 128
+        height: 128
       alignment: 0
-      pivot: {x: .5, y: .5}
+      pivot: {x: 0, y: 0}
   spritePackingTag: 
   userData: 

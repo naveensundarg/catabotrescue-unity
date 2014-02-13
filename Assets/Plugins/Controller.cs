@@ -13,10 +13,10 @@ public class Controller : MonoBehaviour {
 	public Sprite blockSprite;
 	public Sprite handNeg1,handNeg2,handPos1,handPos2;
 	public int maxZ=0;
-
+	public Sprite selecteHeadSprite,angryHeadSprite, normalHeadSprite;
 	public GameObject undoButton, redoButton, resetButton;
 	public Texture undoDisabled, redoDisabled;
-
+	public Material lineMaterial;
 	public GUIStyle undoButtonStyle;
 	public GUIStyle redoButtonStyle;
 	private GUIStyle _emptyStyle=new GUIStyle();
@@ -26,16 +26,20 @@ public class Controller : MonoBehaviour {
 
 	private Stack<GameObject> starting;
 	private int finalLevel;
-	private int _currentLevel=3;
+	private int _currentLevel=1;
 
-	private Rect _undoRect =new Rect (10, 10, 75, 75);
-	private Rect _redoRect = new  Rect (100, 10, 75, 75);
+	private Rect _undoRect =new Rect (10, 0, 50, 50);
+	private Rect _redoRect = new  Rect (60, 0, 50, 50);
 
 	public bool inputEnabled { get; set;}
-
+	private bool _finalAnim;
+	private GameObject finalHead;
+	private float _startTime;
+	private GameObject child;
 	// Use this for initialization
 	void Start () {
 		inputEnabled = true;
+		_finalAnim = false;
 		_levelsJson=JSON.Parse(levelSpecs);
 		finalLevel = _levelsJson.Count;
 		history=new Stack<GameObject>();
@@ -52,12 +56,25 @@ public class Controller : MonoBehaviour {
 		redoButton.GetComponent<ButtonBehavior>().disabled=true;
 		redoButton.GetComponent<ButtonBehavior>().action="redo";
 
+		GameObject dummy = new GameObject ();
+		dummy.AddComponent<SpriteRenderer> ();;
+		dummy.GetComponent<SpriteRenderer> ().sprite = normalHeadSprite;
+
+		float headWidth =30 ;//Camera.main.WorldToScreenPoint(new Vector3(dummy.GetComponent<SpriteRenderer> ().bounds.size.x,0,0));
+		Debug.Log ("Headwidth = " + headWidth);
+		Destroy (dummy);
+
+		//placeLine (Camera.main.ScreenToWorldPoint(new Vector3 (0, 60, 10)), Camera.main.ScreenToWorldPoint(new Vector3 (Screen.width/2-headWidth/2,60, 10)), 0.1f);
+		//placeLine (Camera.main.ScreenToWorldPoint(new Vector3 (Screen.width/2+headWidth/2, 60, 10)), Camera.main.ScreenToWorldPoint(new Vector3 (Screen.width,60, 10)), 0.1f);
 
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (_finalAnim)
+						finalHeadAnim ();
 	
 	}
 
@@ -117,24 +134,57 @@ public class Controller : MonoBehaviour {
 		int[] specs1= c1.GetComponent<Catabot>().specs;
 		int[] specs2= c2.GetComponent<Catabot>().specs;
 		int[] merged = mergeSpecs (specs1, specs2, a, b);
-
+		// child;
 		if (merged.Length > 0)
 		{
+//			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
+//			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
+//
+//
+//			float c1y=c1.transform.position.y;
+//			float c2y=c2.transform.position.y;
+					 child = UpdateHistory (Catabot.createCatabot (merged, this));
+//
+//			GameObject child = UpdateHistory (Catabot.createCatabot (merged, this));
+//			child.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
+//			                                     c1y*0.5f+c2y*0.5f);
 			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
 			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
-
-
+			
+			
 			float c1y=c1.transform.position.y;
 			float c2y=c2.transform.position.y;
 			
-
-			GameObject child = UpdateHistory (Catabot.createCatabot (merged, this));
+			
+			
 			child.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
 			                                     c1y*0.5f+c2y*0.5f);
 		}
 		else {
-			finishLevel();	
+			startHeadAnim();
+			child=finalHead;
+
+			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
+			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
+			
+			
+			float c1y=c1.transform.position.y;
+			float c2y=c2.transform.position.y;
+			
+			
+			
+			finalHead.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
+			             
+			                                     c1y*0.5f+c2y*0.5f);
+
+			_startTime = Time.time;
+
+			_finalAnim=true;
+
+			//Invoke("finishLevel",1);	
 		}
+
+
 	}
 
 	private void loadNewLevel(int level){
@@ -169,6 +219,8 @@ public class Controller : MonoBehaviour {
 
 			_currentLevel++;
 			inputEnabled=true;
+
+
 			loadNewLevel(_currentLevel);
 		}
 		else
@@ -252,11 +304,55 @@ public class Controller : MonoBehaviour {
 		return levelSpecs;
 	}
 
+	void placeLine(Vector3 p1, Vector3 p2, float width){
+		GameObject obj = new GameObject ("line from"+p1 +"to"+ p2);
+		obj.AddComponent<LineRenderer> ();
+		LineRenderer lineRenderer = obj.GetComponent<LineRenderer> ();
+		lineRenderer.SetColors (Color.gray, Color.gray);
+
+		lineRenderer.SetPosition (0, p1);
+		lineRenderer.SetPosition (1, p2);
+		lineRenderer.SetWidth (width, width);
+		lineRenderer.material = lineMaterial;
+		obj.AddComponent<BoxCollider2D> ();
+	}
+
+
+	void startHeadAnim(){
+		finalHead = Catabot.createCatabot(new int[0],this);
+	//	_finalAnim = true;
+	}
+
+	void finalHeadAnim(){
+
+				
+		float yVelocity = 0.0F;
+		float smoothTime = 5f;
+		float maxSpeed=0.1f;
+		float t = (Time.time - _startTime) / smoothTime;
+		Debug.Log ("Time t " + t);
+
+		float finalX = 0;;
+		float finalY = -9.5f;
+
+		Debug.Log("In final Head Anim");
+		finalHead.transform.position = new Vector2(Mathf.SmoothStep(finalHead.transform.position.x, finalX, t),
+		                                           Mathf.SmoothStep(finalHead.transform.position.y, finalY, t));
+		//gameObject.GetComponent<Drag>().mating();
+		if (finalHead.transform.position.y == finalY) {
+			_finalAnim=false;	
+			finishLevel();
+			Destroy(finalHead);
+
+		}
+	}
+
+
 	void OnGUI (){
 		GUI.skin = null;
 
 
-		GUI.BeginGroup(new Rect(0, Screen.height-100, Screen.width, 100));
+		GUI.BeginGroup(new Rect(0, Screen.height-50, Screen.width, 100));
 
 		if (!canUndo()) 
 			GUI.Button (_undoRect,  undoDisabled,_emptyStyle);
@@ -272,6 +368,8 @@ public class Controller : MonoBehaviour {
 
 	
 		GUI.EndGroup ();
+
+
 	}
 
 

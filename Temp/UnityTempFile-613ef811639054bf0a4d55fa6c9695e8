@@ -42,4 +42,5 @@
 'Assets/Plugins/Controller.cs'
 'Assets/Plugins/Drag.cs'
 'Assets/Plugins/Limb.cs'
+'Assets/Plugins/NewBehaviourScript.cs'
 'Assets/Plugins/SimpleJSON.cs'

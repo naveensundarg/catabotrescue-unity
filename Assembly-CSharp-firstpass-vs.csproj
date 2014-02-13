@@ -52,6 +52,7 @@
      <Compile Include="Assets\Plugins\Controller.cs" />
      <Compile Include="Assets\Plugins\Drag.cs" />
      <Compile Include="Assets\Plugins\Limb.cs" />
+     <Compile Include="Assets\Plugins\NewBehaviourScript.cs" />
      <Compile Include="Assets\Plugins\SimpleJSON.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -12,25 +12,39 @@ public class Block : MonoBehaviour {
 
 	private const float SEPARATION_DISTANCE = 1.285f;
 	private GameObject currentMate;
-	private bool _mated;
+	public bool _mated;
+	private float _blockWidth;
+	private Catabot catabot;
+	private bool _pushAway;
+	private float _startTime;
+
+	private bool entered;
 	// Use this for initialization
 	void Start () {
 		Debug.Log("Initializing block behaviour.");
 		_controller=GameObject.FindGameObjectWithTag("Controller").GetComponent<Controller>();
 		_mated = false;
+		catabot = (Catabot)transform.parent.gameObject.GetComponent<Catabot> ();
+		_blockWidth = gameObject.GetComponent<SpriteRenderer> ().bounds.size.x;
+		_pushAway = false;
+		entered = false;
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (_pushAway)
+				pushAway ();
 	
 	}
 
 	void OnTriggerEnter2D (Collider2D other) {
-
 		GameObject otherObj=other.gameObject;
 		if(otherObj.GetComponent<Block>() != null)
 		{
+			entered = true;
+
 			Debug.Log("Colliding with another block");
 			if(otherObj.GetComponent<Block>().limbs==-limbs ) 
 			{
@@ -64,12 +78,14 @@ public class Block : MonoBehaviour {
 			&& Mathf.Abs(p1.y-p2.y) <THRESHOLD_DISTANCE_UPPER;
 	}
 	void OnTriggerExit2D (Collider2D other){
+		entered = false;
+		if (_retractionTrigger == other.gameObject) {
+						gameObject.BroadcastMessage ("ExtrudeLimbs");
+						catabot.setNormalHead ();
 
-		if (_retractionTrigger == other.gameObject) 
-			gameObject.BroadcastMessage ("ExtrudeLimbs");
-		else 
+				} else {	
 			_mated = false;
-
+				}
 
 	}
 
@@ -90,13 +106,19 @@ public class Block : MonoBehaviour {
 
 					Debug.Log ("Responsible Reproduction!");
 					
-					if( matingDistance(otherObj)&& !_mated)
+					if( matingDistance(otherObj)&& !_mated && entered)
 					{
 						Debug.Log ("Reproduction!");
 						_mated=true;
+						otherObj.GetComponent<Block>()._mated=true;
+						int otherLoc=otherObj.GetComponent<Block>().location;
+						float s1 =transform.position.x;
+						float s2 = otherObj.transform.position.x;
 						float p1 =transform.root.position.y;
 						float p2 = otherObj.transform.root.position.y;
-						otherObj.transform.root.transform.position = new Vector2(transform.root.position.x,
+
+
+						otherObj.transform.root.transform.position = new Vector2(transform.root.transform.position.x+(location-otherLoc)*_blockWidth,
 						                                                         p1<p2?
 						                                                         p1+SEPARATION_DISTANCE:p1-SEPARATION_DISTANCE);
 						//otherObj.GetComponent<Drag>().dragRootBy(new Vector2(p1.x-p2.x,p1.y-p2.y+2.51f));
@@ -105,9 +127,10 @@ public class Block : MonoBehaviour {
 						_controller.reproduce(gameObject.transform.root.gameObject,
 						                      otherObj.transform.root.gameObject,
 						                      location, 
-						                      otherObj.GetComponent<Block>().location);
+						                      otherLoc);
 						currentMate=otherObj;
-						Invoke("pushAway",1);
+
+						Invoke("pushAwayStart",0.5f);
 					}
 				//	Debug.Log ("Reproduction!");
 					
@@ -118,6 +141,7 @@ public class Block : MonoBehaviour {
 			else{
 				_retractionTrigger=other.gameObject;
 				gameObject.BroadcastMessage("RetractLimbs");
+				catabot.setAngryHead();
 			}
 			
 			
@@ -134,16 +158,33 @@ public class Block : MonoBehaviour {
 		_controller.inputEnabled = true;
 	}
 
+	void pushAwayStart(){
+		_mated = true;
+		_pushAway=true;
+		_startTime=Time.time;		
+
+	}
 
 	void pushAway(){
+
+
 		float p1 =transform.root.position.y;
 		float p2 = currentMate.transform.root.position.y;
-
-		currentMate.transform.root.transform.position = new Vector2(transform.root.position.x,
-		                                                         p1<p2?
-		                                                         p1+1.4f*SEPARATION_DISTANCE:p1-1.4f*SEPARATION_DISTANCE);
-
-		enableInput ();
+		 float yVelocity = 0.0F;
+		 float smoothTime = 0.5f;
+		float maxSpeed=1f;
+		float t = (Time.time - _startTime) / smoothTime;
+		float finalY = p1 < p2 ?
+			p1 + 1.4f * SEPARATION_DISTANCE : p1 - 1.4f * SEPARATION_DISTANCE;
+		currentMate.transform.root.transform.position = new Vector2(currentMate.transform.root.position.x,
+		                                                            Mathf.SmoothStep(currentMate.transform.root.transform.position.y, 
+		                 finalY, t));
+		//gameObject.GetComponent<Drag>().mating();
+		Debug.Log (currentMate.transform.root.transform.position.y +","+ finalY);
+		if (currentMate.transform.root.transform.position.y == finalY) {
+			_pushAway=false;		
+			enableInput ();
+				}
 	}
 
 }

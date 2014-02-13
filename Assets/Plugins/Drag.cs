@@ -68,6 +68,11 @@ public class Drag : MonoBehaviour {
 
 	}
 
+	public void mating(){
+		_active=false;
+		deselected ();
+
+	}
 	void OnMouseUp()     
 	{
 		_active=false;
@@ -76,9 +81,15 @@ public class Drag : MonoBehaviour {
 	}
 	public void selected(){
 		_selected = true;
-		if(gameObject!=catabot)
-			catabot.GetComponent<Drag> ().selected ();	
-
+		if (gameObject != catabot) {
+						catabot.GetComponent<Drag> ().selected ();	
+				
+				} 
+		else {
+		
+			gameObject.GetComponent<Catabot>().selectedHead();
+		
+		}
 	}
 
 	public bool inputEnabled(){
@@ -88,6 +99,11 @@ public class Drag : MonoBehaviour {
 		_selected = false;
 		if(gameObject!=catabot)
 		catabot.GetComponent<Drag> ().deselected ();	
+		else {
+			
+			gameObject.GetComponent<Catabot>().deSelectedHead();
+			
+		}
 
 	}
 

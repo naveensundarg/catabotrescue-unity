@@ -46,9 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Boomlagoon\JSON\JSONObject.cs" />
-     <Compile Include="Assets\Boomlagoon\JSON\TestScene\JSONObjectTester.cs" />
-     <None Include="Assets\Boomlagoon\JSON\Readme.txt" />
+     <Compile Include="Assets\Resources\GUI\NewBehaviourScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
