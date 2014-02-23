@@ -7,6 +7,8 @@ using SimpleJSON;
 
 public class Controller : MonoBehaviour {
 
+	public  static String UserID="";
+
 	public GUIText prisonLabel;
 	public string levelSpecs;
 	public Sprite[] headSprites;
@@ -27,7 +29,7 @@ public class Controller : MonoBehaviour {
 	private Stack<GameObject> starting;
 	private int finalLevel;
 	private int _currentLevel=1;
-
+	private int _totalMoves = 0;
 	private Rect _undoRect =new Rect (10, 0, 50, 50);
 	private Rect _redoRect = new  Rect (60, 0, 50, 50);
 
@@ -36,6 +38,8 @@ public class Controller : MonoBehaviour {
 	private GameObject finalHead;
 	private float _startTime;
 	private GameObject child;
+
+	private string log;
 	// Use this for initialization
 	void Start () {
 		inputEnabled = true;
@@ -44,7 +48,10 @@ public class Controller : MonoBehaviour {
 		finalLevel = _levelsJson.Count;
 		history=new Stack<GameObject>();
 		future=new Stack<GameObject>();
-		loadNewLevel (_currentLevel);
+		_currentLevel = Cloud.maxLevelCompleted(UserID) ;
+
+		
+		loadNewLevel(_currentLevel);
 //		int[] bot1 = new int[] { 1, -4};
 //		placeRandomly(Catabot.createCatabot(bot1,this));
 //		int[] bot2 = new int[] { 4, 1};
@@ -102,7 +109,7 @@ public class Controller : MonoBehaviour {
 			obj.SetActive(false);
 			future.Push(obj);
 			redoButton.GetComponent<ButtonBehavior>().disabled=false;
-
+			_totalMoves--;
 		}
 		if(history.Count==0){
 			undoButton.GetComponent<ButtonBehavior>().disabled=true;
@@ -118,7 +125,7 @@ public class Controller : MonoBehaviour {
 			history.Push(obj);
 			obj.SetActive(true);
 			undoButton.GetComponent<ButtonBehavior>().disabled=false;
-
+			_totalMoves++;
 		}
 		if(future.Count==0){
 			redoButton.GetComponent<ButtonBehavior>().disabled=true;
@@ -128,13 +135,22 @@ public class Controller : MonoBehaviour {
 		
 	}
 
+	private void clearFuture(){
+
+		future.Clear ();
+	}
 
 	public void reproduce(GameObject c1, GameObject c2, int a, int b){
 
 		int[] specs1= c1.GetComponent<Catabot>().specs;
 		int[] specs2= c2.GetComponent<Catabot>().specs;
+
 		int[] merged = mergeSpecs (specs1, specs2, a, b);
-		// child;
+
+		gamelog ("["+System.DateTime.UtcNow+": Merging " + printArray (specs1) + printArray (specs2)+"]\n");
+		clearFuture ();
+		_totalMoves++;
+		        // child;
 		if (merged.Length > 0)
 		{
 //			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
@@ -189,7 +205,11 @@ public class Controller : MonoBehaviour {
 
 	private void loadNewLevel(int level){
 		clearLevel();
+
 		prisonLabel.text = "Prison: " + _currentLevel;
+	
+		PlayerPrefs.SetInt("CurrentLevel", _currentLevel);
+		PlayerPrefs.Save ();
 
 		int[][] catabots = getLevel(level);
 		starting = new Stack<GameObject> ();
@@ -204,7 +224,8 @@ public class Controller : MonoBehaviour {
 
 	private void clearLevel(){
 		inputEnabled = true;
-
+		log = "";
+		_totalMoves = 0;
 		while (history.Count>0) 
 			Destroy(history.Pop());		
 		while (starting!=null && starting.Count>0) 
@@ -213,6 +234,8 @@ public class Controller : MonoBehaviour {
 	}
 
 	private void finishLevel(){
+
+		Cloud.saveLevel (UserID, _currentLevel, log,_totalMoves);
 
 		inputEnabled = true;
 		if(_currentLevel!=finalLevel){
@@ -230,15 +253,22 @@ public class Controller : MonoBehaviour {
 
 	}
 
-	private void printArray(int[] s){
+	private string printArray(int[] s){
 		string p="[";
 		foreach(int i in s){
 			p=p+i + " ";
 		}
 		p = p + "]";
 		Debug.Log (p);
+		return p;
+	}
+
+	private void gamelog(string message){
+		log = log + message;
 	}
 	private int[] mergeSpecs(int[] specs1, int[] specs2, int a, int b){
+
+
 		HashSet<int> limbs=new HashSet<int>();
 		int[] specs = new int[specs1.Length+specs2.Length-2];
 		int index=0;
@@ -345,11 +375,16 @@ public class Controller : MonoBehaviour {
 			Destroy(finalHead);
 
 		}
-	}
+	}	
 
 
 	void OnGUI (){
 		GUI.skin = null;
+		GUI.skin.label.normal.textColor = Color.black;
+		GUI.BeginGroup(new Rect(0, 0, Screen.width, 100));
+		GUI.Label (new Rect (0, 0, 400, 100), "User ID:" + UserID);		
+		GUI.EndGroup ();
+
 
 
 		GUI.BeginGroup(new Rect(0, Screen.height-50, Screen.width, 100));
