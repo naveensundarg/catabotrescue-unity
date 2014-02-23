@@ -9,7 +9,7 @@ public class Controller : MonoBehaviour {
 
 	public  static String UserID="";
 
-	public GUIText prisonLabel;
+	public GUIText scoreLabel;
 	public string levelSpecs;
 	public Sprite[] headSprites;
 	public Sprite blockSprite;
@@ -39,12 +39,29 @@ public class Controller : MonoBehaviour {
 	private float _startTime;
 	private GameObject child;
 
+	public bool testLevels;
+
+	public int totalLevels;
+	private void runTestLevels(){
+
+		for(int i = 0;i <totalLevels;i++){
+
+			getLevel(i);
+			Debug.Log("Loaded Level "+i);
+		}
+	}
+
 	private string log;
 	// Use this for initialization
 	void Start () {
-		inputEnabled = true;
+				inputEnabled = true;
 		_finalAnim = false;
 		_levelsJson=JSON.Parse(levelSpecs);
+
+		if (testLevels)
+			runTestLevels ();
+
+
 		finalLevel = _levelsJson.Count;
 		history=new Stack<GameObject>();
 		future=new Stack<GameObject>();
@@ -79,6 +96,7 @@ public class Controller : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		scoreLabel.text = "[Prison: " + _currentLevel + "] [Total Moves:"+_totalMoves+"]";
 
 		if (_finalAnim)
 						finalHeadAnim ();
@@ -206,8 +224,8 @@ public class Controller : MonoBehaviour {
 	private void loadNewLevel(int level){
 		clearLevel();
 
-		prisonLabel.text = "Prison: " + _currentLevel;
-	
+		scoreLabel.text = "[Prison: " + _currentLevel + "] [Total Moves:"+_totalMoves+"]";
+
 		PlayerPrefs.SetInt("CurrentLevel", _currentLevel);
 		PlayerPrefs.Save ();
 
@@ -253,6 +271,7 @@ public class Controller : MonoBehaviour {
 
 	}
 
+	
 	private string printArray(int[] s){
 		string p="[";
 		foreach(int i in s){
