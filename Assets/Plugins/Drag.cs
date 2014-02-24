@@ -8,13 +8,21 @@ public class Drag : MonoBehaviour {
 	private Controller _controller;
 	private SpringJoint2D spring;
 	private bool _active;
-
+	private Catabot catabotComp;
 	public GameObject catabot;
+	float doorLeft=0.475f;
+	float doorRight = 0.525f;
+
 	void Awake()
 	{
-
 		_controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Controller>();
 	//		
+	}
+
+	void Start(){
+
+		catabotComp = catabot.GetComponent<Catabot> ();
+
 	}
 
 	public bool getSelected(){
@@ -54,11 +62,36 @@ public class Drag : MonoBehaviour {
 	}
 	
 	public void dragRootBy(Vector2 delta){
-		GameObject dragabble = gameObject.transform.root.gameObject;
+		GameObject dragabble = gameObject.transform.root.gameObject; 
+		Vector2 pleft = Camera.main.WorldToViewportPoint (new Vector2 (dragabble.transform.position.x - catabotComp.leftSide, dragabble.transform.position.y) 
+						+ delta); 
+		Vector2 pright = Camera.main.WorldToViewportPoint(new Vector2 (dragabble.transform.position.x+catabotComp.rightSide, dragabble.transform.position.y) + delta); 
 
-		dragabble.transform.position = new Vector2 (dragabble.transform.position.x, dragabble.transform.position.y) + delta;
+		Vector2 ptop = Camera.main.WorldToViewportPoint (new Vector2 (dragabble.transform.position.x , dragabble.transform.position.y+catabotComp.halfHeight) 
+		                                                  + delta); 
+		Vector2 pbottom = Camera.main.WorldToViewportPoint(new Vector2 (dragabble.transform.position.x, dragabble.transform.position.y-catabotComp.halfHeight) 
+		                                                   + delta); 
+
+
+		if (inView (pleft.x,pright.x,ptop.y,pbottom.y) &&outSideDoor (pleft.x,pright.x,ptop.y,pbottom.y))
+			dragabble.transform.position = new Vector2 (dragabble.transform.position.x, dragabble.transform.position.y) + delta;
+
+
 
 	}
+	bool inView(float leftEdge, float rightEdge, float topEdge,float BottomEdge){
+		return leftEdge>0 && rightEdge <1 && BottomEdge>0 && topEdge<1;
+
+
+	}
+
+	bool outSideDoor(float leftEdge, float rightEdge, float topEdge,float BottomEdge){
+
+		if ( (leftEdge<doorLeft && rightEdge>doorLeft) || (leftEdge<doorRight && rightEdge>doorRight))
+						return BottomEdge > 0.05;
+		return true;
+	}
+
 	void bringUpTo(int z){
 
 		SpriteRenderer renderer = gameObject.gameObject.GetComponent<SpriteRenderer>();

@@ -10,7 +10,8 @@ public class Catabot :MonoBehaviour  {
 	static float D =.132f;
 	static int id=0;
 
-
+	public float fullWidth;
+	public float halfHeight;
 	public int[] specs;
 	public float rightSide;
 	public float leftSide;
@@ -89,11 +90,12 @@ public class Catabot :MonoBehaviour  {
 		head.transform.localPosition=new Vector2(head.transform.localPosition.y-width/2-headWidth/2, head.transform.localPosition.y);
 		_xOffset=width/2;//+headWidth/2;
 		
-		_leftSide=headWidth*.5f+0.5f*getSpriteWidth(dummyblock);
+		_leftSide=headWidth+0.5f*getSpriteWidth(dummyblock);
 		
 		catabot.GetComponent<Catabot> ().head = head;
-		Destroy (dummyblock);
 		width = width - getSpriteWidth (dummyblock);
+		Destroy (dummyblock);
+
 		//addSprite(catabot,""
 		for(int i = 0; i < specs.Length; i++){
 
@@ -130,6 +132,9 @@ public class Catabot :MonoBehaviour  {
 
 		catabot.GetComponent<Catabot> ().rightSide = width-_xOffset;
 		catabot.GetComponent<Catabot> ().leftSide=_leftSide;
+		catabot.GetComponent<Catabot> ().fullWidth = width + headWidth;
+		catabot.GetComponent<Catabot> ().halfHeight = height * .5f;
+
 
 		_xPos=0;
 		_blockOffset=0;
@@ -264,8 +269,5 @@ public class Catabot :MonoBehaviour  {
 
 		return renderer.bounds.size.x;
 	}
-
-
-
 
 }

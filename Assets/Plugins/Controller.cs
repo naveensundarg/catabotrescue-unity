@@ -9,6 +9,8 @@ public class Controller : MonoBehaviour {
 
 	public  static String UserID="";
 
+	public AudioClip mating, success, levelUPP;
+
 	public GUIText scoreLabel;
 	public string levelSpecs;
 	public Sprite[] headSprites;
@@ -26,6 +28,8 @@ public class Controller : MonoBehaviour {
 	private GUIStyle _emptyStyle=new GUIStyle();
 	public Stack<GameObject> history;
 	private Stack<GameObject> future;
+
+
 	private JSONNode _levelsJson;
 
 	private Stack<GameObject> starting;
@@ -181,6 +185,8 @@ public class Controller : MonoBehaviour {
 		        // child;
 		if (merged.Length > 0)
 		{
+			audio.PlayOneShot (mating);
+
 //			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
 //			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
 //
@@ -205,6 +211,8 @@ public class Controller : MonoBehaviour {
 			                                     c1y*0.5f+c2y*0.5f);
 		}
 		else {
+			audio.PlayOneShot (levelUPP);
+
 			startHeadAnim();
 			child=finalHead;
 
@@ -224,6 +232,7 @@ public class Controller : MonoBehaviour {
 			_startTime = Time.time;
 
 			_finalAnim=true;
+			audio.PlayOneShot (success);
 
 			//Invoke("finishLevel",1);	
 		}
@@ -433,7 +442,8 @@ public class Controller : MonoBehaviour {
 			Undo();
 				
 
-
+		if (canRedo()&& GUI.Button (_redoRect, "", redoButtonStyle)) 
+			Redo();
 
 
 	
