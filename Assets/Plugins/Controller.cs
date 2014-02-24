@@ -21,6 +21,8 @@ public class Controller : MonoBehaviour {
 	public Material lineMaterial;
 	public GUIStyle undoButtonStyle;
 	public GUIStyle redoButtonStyle;
+	public GUIStyle resetButtonStyle;
+
 	private GUIStyle _emptyStyle=new GUIStyle();
 	public Stack<GameObject> history;
 	private Stack<GameObject> future;
@@ -32,6 +34,8 @@ public class Controller : MonoBehaviour {
 	private int _totalMoves = 0;
 	private Rect _undoRect =new Rect (10, 0, 50, 50);
 	private Rect _redoRect = new  Rect (60, 0, 50, 50);
+	private Rect _resetRect = new  Rect (Screen.width-50, 0, 50,50);
+	
 
 	public bool inputEnabled { get; set;}
 	private bool _finalAnim;
@@ -153,6 +157,12 @@ public class Controller : MonoBehaviour {
 		
 	}
 
+	public void Reset(){
+
+		clearLevel();
+		loadNewLevel(_currentLevel);
+	}
+
 	private void clearFuture(){
 
 		future.Clear ();
@@ -248,6 +258,9 @@ public class Controller : MonoBehaviour {
 			Destroy(history.Pop());		
 		while (starting!=null && starting.Count>0) 
 			Destroy(starting.Pop());	
+
+		while (future.Count>0) 
+			Destroy(future.Pop());	
 
 	}
 
@@ -400,6 +413,8 @@ public class Controller : MonoBehaviour {
 	void OnGUI (){
 		GUI.skin = null;
 		GUI.skin.label.normal.textColor = Color.black;
+		GUI.skin.label.fontStyle=FontStyle.Bold;
+
 		GUI.BeginGroup(new Rect(0, 0, Screen.width, 100));
 		GUI.Label (new Rect (0, 0, 400, 100), "User ID:" + UserID);		
 		GUI.EndGroup ();
@@ -417,13 +432,15 @@ public class Controller : MonoBehaviour {
 		if (canUndo()&& GUI.Button (_undoRect, "", undoButtonStyle)) 
 			Undo();
 				
-		if (canRedo () && GUI.Button (_redoRect, "", redoButtonStyle)) 
-			Redo ();
+
+
+
 
 	
 		GUI.EndGroup ();
-
-
+		if ( GUI.Button (_resetRect, "", resetButtonStyle)) 
+			Reset();
+		
 	}
 
 

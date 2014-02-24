@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\HomeController.cs" />
+     <Compile Include="Assets\Trash.cs" />
      <None Include="Assets\Parse\Parse.Unity.xml" />
      <None Include="Assets\Parse\README.txt" />
      <None Include="Assets\Parse.Unity\Parse.Unity.xml" />

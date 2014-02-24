@@ -93,6 +93,7 @@ public class Catabot :MonoBehaviour  {
 		
 		catabot.GetComponent<Catabot> ().head = head;
 		Destroy (dummyblock);
+		width = width - getSpriteWidth (dummyblock);
 		//addSprite(catabot,""
 		for(int i = 0; i < specs.Length; i++){
 
