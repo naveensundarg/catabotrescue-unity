@@ -73,7 +73,7 @@ public class Drag : MonoBehaviour {
 		                                                   + delta); 
 
 
-		if (inView (pleft.x,pright.x,ptop.y,pbottom.y) &&outSideDoor (pleft.x,pright.x,ptop.y,pbottom.y))
+		if (inView (pleft.x,pright.x,ptop.y,pbottom.y) &&outSideDoor (pleft.x,pright.x,ptop.y,pbottom.y)  &&inputEnabled())
 			dragabble.transform.position = new Vector2 (dragabble.transform.position.x, dragabble.transform.position.y) + delta;
 
 

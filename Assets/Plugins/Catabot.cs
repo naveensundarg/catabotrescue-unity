@@ -222,7 +222,36 @@ public class Catabot :MonoBehaviour  {
 		}
 
 	}
-	
+
+
+	public void placeOnScreenWrtParents(GameObject parentCatabot1, GameObject parentCatabot2){
+
+		Transform parent1 = parentCatabot1.transform;
+		Transform parent2 = parentCatabot2.transform;
+
+		float p1Leftx = parent1.position.x - parent1.GetComponent<Catabot> ().leftSide;
+		float p2Leftx = parent2.position.x - parent2.GetComponent<Catabot> ().leftSide;
+
+
+		float p1Rightx = parent1.position.x + parent1.GetComponent<Catabot> ().rightSide;
+		float p2Rightx = parent2.position.x + parent2.GetComponent<Catabot> ().rightSide;
+
+		Vector2 posLeft=new Vector2(Mathf.Min(p1Leftx,p2Leftx)-rightSide,
+		                        parent1.position.y*0.5f+parent2.position.y*0.5f);
+
+		Vector2 posRight=new Vector2(Mathf.Max(p1Rightx,p2Rightx)+leftSide,
+		                        parent1.position.y*0.5f+parent2.position.y*0.5f);
+
+		Vector2 myLeftEdge = new Vector2 (posLeft.x - leftSide, posLeft.y);
+		Vector2 onScreenLeft = Camera.main.WorldToViewportPoint (myLeftEdge);
+
+		transform.position = posLeft;
+		if (onScreenLeft.x < 0)
+						transform.position = posRight;
+
+
+
+	}
 
 	private static void placeBlock(GameObject block){
 		block.transform.position=new Vector2(block.transform.position.x+_blockOffset,block.transform.position.y);

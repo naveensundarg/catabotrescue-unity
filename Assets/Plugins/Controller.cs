@@ -42,11 +42,11 @@ public class Controller : MonoBehaviour {
 	
 
 	public bool inputEnabled { get; set;}
-	private bool _finalAnim;
+	private bool _finalAnim, _finalAnimPart1, _finalAnimPart2 ;
 	private GameObject finalHead;
 	private float _startTime;
 	private GameObject child;
-
+	private Vector3 finalPos1, finalPos2 ;
 	public bool testLevels;
 
 	public int totalLevels;
@@ -64,6 +64,8 @@ public class Controller : MonoBehaviour {
 	void Start () {
 				inputEnabled = true;
 		_finalAnim = false;
+		_finalAnimPart1 = false;
+		_finalAnimPart2 = false;
 		_levelsJson=JSON.Parse(levelSpecs);
 
 		if (testLevels)
@@ -75,7 +77,11 @@ public class Controller : MonoBehaviour {
 		future=new Stack<GameObject>();
 		_currentLevel = Cloud.maxLevelCompleted(UserID) ;
 
-		
+		if (UserID.Equals("tester@gmail.com"))
+						_currentLevel = Mathf.Max (_currentLevel, 5);
+
+		finalPos1 = Camera.main.ViewportToWorldPoint (new Vector3 (0.55f,0.075f,11));
+		finalPos2= Camera.main.ViewportToWorldPoint (new Vector3 (0.55f,-1,11));
 		loadNewLevel(_currentLevel);
 //		int[] bot1 = new int[] { 1, -4};
 //		placeRandomly(Catabot.createCatabot(bot1,this));
@@ -173,7 +179,6 @@ public class Controller : MonoBehaviour {
 	}
 
 	public void reproduce(GameObject c1, GameObject c2, int a, int b){
-
 		int[] specs1= c1.GetComponent<Catabot>().specs;
 		int[] specs2= c2.GetComponent<Catabot>().specs;
 
@@ -198,24 +203,29 @@ public class Controller : MonoBehaviour {
 //			GameObject child = UpdateHistory (Catabot.createCatabot (merged, this));
 //			child.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
 //			                                     c1y*0.5f+c2y*0.5f);
-			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
-			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
-			
-			
-			float c1y=c1.transform.position.y;
-			float c2y=c2.transform.position.y;
-			
-			
-			
-			child.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
-			                                     c1y*0.5f+c2y*0.5f);
+//			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
+//			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
+//			
+//			
+//			float c1y=c1.transform.position.y;
+//			float c2y=c2.transform.position.y;
+//			
+//			
+//			
+//			child.transform.position=new Vector2(Mathf.Min(c1x,c2x)-child.GetComponent<Catabot>().rightSide,
+//			                                     c1y*0.5f+c2y*0.5f);
+//
+			child.GetComponent<Catabot>().placeOnScreenWrtParents(c1,c2);
+
 		}
 		else {
+			inputEnabled = false;
+			if(_finalAnim) return;
 			audio.PlayOneShot (levelUPP);
 
 			startHeadAnim();
 			child=finalHead;
-
+			history.Push(finalHead);	
 			float c1x=c1.transform.position.x-c1.GetComponent<Catabot>().leftSide;
 			float c2x=c2.transform.position.x-c2.GetComponent<Catabot>().leftSide;
 			
@@ -232,6 +242,7 @@ public class Controller : MonoBehaviour {
 			_startTime = Time.time;
 
 			_finalAnim=true;
+			_finalAnimPart1=false;
 			audio.PlayOneShot (success);
 
 			//Invoke("finishLevel",1);	
@@ -239,6 +250,8 @@ public class Controller : MonoBehaviour {
 
 
 	}
+
+	
 
 	private void loadNewLevel(int level){
 		clearLevel();
@@ -256,6 +269,10 @@ public class Controller : MonoBehaviour {
 		}
 		inputEnabled = true;
 
+
+		if (level > 7) {
+			Application.LoadLevel("done");		
+		}
 
 	}
 
@@ -396,26 +413,28 @@ public class Controller : MonoBehaviour {
 
 	void finalHeadAnim(){
 
-				
-		float yVelocity = 0.0F;
-		float smoothTime = 5f;
-		float maxSpeed=0.1f;
+		Vector2 finalPos=!_finalAnimPart1?finalPos1:finalPos2;		
+		float smoothTime = 2.5f;
 		float t = (Time.time - _startTime) / smoothTime;
 		Debug.Log ("Time t " + t);
 
-		float finalX = 0;;
-		float finalY = -9.5f;
-
-		Debug.Log("In final Head Anim");
-		finalHead.transform.position = new Vector2(Mathf.SmoothStep(finalHead.transform.position.x, finalX, t),
-		                                           Mathf.SmoothStep(finalHead.transform.position.y, finalY, t));
-		//gameObject.GetComponent<Drag>().mating();
-		if (finalHead.transform.position.y == finalY) {
+		if (finalHead.transform.position.y == finalPos1.y) {
+			_finalAnimPart1=true;
+			_startTime=Time.time;
+		}
+		
+		if (finalHead.transform.position.y == finalPos2.y) {
 			_finalAnim=false;	
 			finishLevel();
 			Destroy(finalHead);
-
+			
 		}
+		Debug.Log("In final Head Anim");
+
+		finalHead.transform.position = new Vector2(Mathf.SmoothStep(finalHead.transform.position.x, finalPos.x, t),
+		                                           Mathf.SmoothStep(finalHead.transform.position.y, finalPos.y, t));
+
+
 	}	
 
 
@@ -425,7 +444,11 @@ public class Controller : MonoBehaviour {
 		GUI.skin.label.fontStyle=FontStyle.Bold;
 
 		GUI.BeginGroup(new Rect(0, 0, Screen.width, 100));
-		GUI.Label (new Rect (0, 0, 400, 100), "User ID:" + UserID);		
+		GUI.skin.label.normal.textColor = Color.gray;
+
+		GUI.Label (new Rect (0, 0, 400, 100), "" + UserID);		
+		GUI.skin.label.normal.textColor = Color.black;
+
 		GUI.EndGroup ();
 
 

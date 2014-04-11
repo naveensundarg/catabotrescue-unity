@@ -3,7 +3,6 @@ using System.Collections;
 using Parse;
 
 public class Cloud : MonoBehaviour {
-
 	// Use this for initialization
 	void Start () {
 	
@@ -53,7 +52,7 @@ public class Cloud : MonoBehaviour {
 			
 		});
 
-		PlayerPrefs.SetInt ("level", level);
+		PlayerPrefs.SetInt ("level", level+1);
 		PlayerPrefs.Save();
 
 	}
