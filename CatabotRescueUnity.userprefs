@@ -1,9 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Plugins/Controller.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../robotopia/Assets/Scripts/robotComputer.js">
     <Files>
-      <File FileName="Assets/Plugins/Controller.cs" Line="229" Column="4" />
-      <File FileName="Assets/Plugins/Drag.cs" Line="75" Column="3" />
+      <File FileName="../robotopia/Assets/Scripts/robotComputer.js" Line="112" Column="21" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
